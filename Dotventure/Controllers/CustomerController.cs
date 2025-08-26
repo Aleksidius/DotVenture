@@ -24,11 +24,11 @@ namespace Dotventure.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var customer = await _service.GetByIdAsync(id);
-            if (customer == null)
-                return NotFound();
+            //var customer = await _service.getbyidasync(id);
+            //if (customer == null)
+            //    return notfound();
 
-            return Ok(customer);
+            return Ok(1);
         }
     }
 

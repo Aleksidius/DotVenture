@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql/data
+      - ./db:/var/opt/mssql/backup
+      - ./db/init-db.sh:/usr/local/bin/init-db.sh
+    user: root
+    restart: unless-stopped
+    command: /bin/bash -c "/opt/mssql/bin/sqlservr & /usr/local/bin/init-db.sh && wait"
+
+  api:
+    build: .
+    container_name: dotnet_api
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=AdventureWorksLT2022;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=False;
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    command: ["sh", "-c", "sleep 45 && dotnet Dotventure.Api.dll"]
+
+volumes:
+  db_data:
